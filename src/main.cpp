@@ -1,216 +1,81 @@
 #include <Arduino.h>
-#include <VectorGFX.h>
+#include "3d_wireframe/space_3d.hpp"
 
-#include "3d/space_3d.hpp"
-
-VectorGFX gfx;
-Space3D space3D;
-
-void testPattern()
-{
-    /* Square in bottom-left */
-    gfx.moveto(0, 0);
-    gfx.lineto(1024, 0);
-    gfx.lineto(1024, 1024);
-    gfx.lineto(0, 1024);
-    gfx.lineto(0, 0);
-
-    /* Fill square with starbust pattern */
-    gfx.moveto(0, 0);
-    for (unsigned j = 0; j <= 1024; j += 128)
-    {
-
-        gfx.lineto(1024, j);
-        gfx.moveto(0, 0);
-        gfx.lineto(j, 1024);
-        gfx.moveto(0, 0);
-    }
-    for (unsigned j = 0; j < 1024; j += 128)
-    {
-
-        gfx.lineto(j, 1024);
-        gfx.moveto(0, 0);
-    }
-
-    /* Triangle in bottom-right */
-    gfx.moveto(4095, 0);
-    gfx.lineto(4095 - 512, 0);
-    gfx.lineto(4095 - 0, 512);
-    gfx.lineto(4095, 0);
-
-    /* Square in top-right */
-    gfx.moveto(4095, 4095);
-    gfx.lineto(4095 - 512, 4095);
-    gfx.lineto(4095 - 512, 4095 - 512);
-    gfx.lineto(4095, 4095 - 512);
-    gfx.lineto(4095, 4095);
-
-    /* Hourglass in top-left */
-    gfx.moveto(0, 4095);
-    gfx.lineto(512, 4095);
-    gfx.lineto(0, 4095 - 512);
-    gfx.lineto(512, 4095 - 512);
-    gfx.lineto(0, 4095);
-
-    /* Center target */
-    gfx.moveto(2047, 2047 - 512);
-    gfx.lineto(2047, 2047 + 512);
-    gfx.moveto(2047 - 512, 2047);
-    gfx.lineto(2047 + 512, 2047);
-}
+Space3D space_3d;
 
 void setup() {
   Serial.begin(115200);
-
-  Serial.println("Initialising 3D space...");
-  space3D = Space3D();
-
-  Serial.println("Starting gfx engine...");
-  gfx.begin();
-
-  Serial.println("Initialising camera perspective");
-
-  Perspective perspective;
-  Projection projection;
-
-  space3D.set_perspective(perspective);
-  space3D.set_projection(projection);
-
-  testPattern();
-  gfx.display();
-  delay(5000);
+  Serial.println("ESP32 3D Wireframe");
 }
 
-void draw_cube(float offset_x, float offset_y, float offset_z, float scaleFactor)
+void cube_explosion(Space3D &space_3d, uint16_t scale)
 {
-  int point_count = space3D.get_vertices_count();
-  Edge edge;
-
-  // Load our points into there
-  space3D.add_point(Point3D {.x = offset_x + -1*scaleFactor, .y = offset_y + 1*scaleFactor, .z = offset_z + -1*scaleFactor});
-  space3D.add_point(Point3D {.x = offset_x + 1*scaleFactor, .y = offset_y + 1*scaleFactor, .z = offset_z + -1*scaleFactor});
-  space3D.add_point(Point3D {.x = offset_x + 1*scaleFactor, .y = offset_y + -1*scaleFactor, .z = offset_z + -1*scaleFactor});
-  space3D.add_point(Point3D {.x = offset_x + -1*scaleFactor, .y = offset_y + -1*scaleFactor, .z = offset_z + -1*scaleFactor});
-
-  space3D.add_point(Point3D {.x = offset_x + -1*scaleFactor, .y = offset_y + 1*scaleFactor, .z = offset_z + 1*scaleFactor});
-  space3D.add_point(Point3D {.x = offset_x + 1*scaleFactor, .y = offset_y + 1*scaleFactor, .z = offset_z + 1*scaleFactor});
-  space3D.add_point(Point3D {.x = offset_x + 1*scaleFactor, .y = offset_y + -1*scaleFactor, .z = offset_z + 1*scaleFactor});
-  space3D.add_point(Point3D {.x = offset_x + -1*scaleFactor, .y = offset_y + -1*scaleFactor, .z = offset_z + 1*scaleFactor});
-
-  Serial.println("Connecting the points with edges...");
- 
-  edge.from = 0 + point_count;
-  edge.to = 1 + point_count;
-  space3D.add_edge(edge);
-
-  edge.from = 1 + point_count;
-  edge.to = 2 + point_count;
-  space3D.add_edge(edge);
-
-  edge.from = 2 + point_count;
-  edge.to = 3 + point_count;
-  space3D.add_edge(edge);
-
-  edge.from = 3 + point_count;
-  edge.to = 0 + point_count;
-  space3D.add_edge(edge);
-
-  // Extra cross vertices
-  // edge.from = 0 + point_count;
-  // edge.to = 2 + point_count;
-  // space3D.add_edge(edge);
-
-  // edge.from = 1 + point_count;
-  // edge.to = 3 + point_count;
-  // space3D.add_edge(edge);
-
-  edge.from = 4 + point_count;
-  edge.to = 5 + point_count;
-  space3D.add_edge(edge);
-
-  edge.from = 5 + point_count;
-  edge.to = 6 + point_count;
-  space3D.add_edge(edge);
-
-  edge.from = 6 + point_count;
-  edge.to = 7 + point_count;
-  space3D.add_edge(edge);
-
-  edge.from = 7 + point_count;
-  edge.to = 4 + point_count;
-  space3D.add_edge(edge);
-
-  edge.from = 0 + point_count;
-  edge.to = 4 + point_count;
-  space3D.add_edge(edge);
-
-  edge.from = 1 + point_count;
-  edge.to = 5 + point_count;
-  space3D.add_edge(edge);
-
-  edge.from = 2 + point_count;
-  edge.to = 6 + point_count;
-  space3D.add_edge(edge);
-
-  edge.from = 3 + point_count;
-  edge.to = 7 + point_count;
-  space3D.add_edge(edge);
-}
-
-void cube_explosion(uint16_t scale)
-{
-  space3D.clear();
+  space_3d.clear_all();
   // Fill scene with objects
-  draw_cube(0, 0, 0, 400);
+  space_3d.add_model(0, CUBE,  0,        0,       0,       400);
+  space_3d.add_model(1, CUBE, -1*scale,  0,       0,       200);
+  space_3d.add_model(2, CUBE,  1*scale,  0,       0,       200);
+  space_3d.add_model(3, CUBE,  0,       -1*scale, 0,       200);
+  space_3d.add_model(4, CUBE,  0,        1*scale, 0,       200);
+  space_3d.add_model(5, CUBE,  0,        0,      -1*scale, 200);
+  space_3d.add_model(6, CUBE,  0,        0,       1*scale, 200);
 
-  draw_cube(-1*scale, 0, 0, 200);
-  draw_cube(1*scale, 0, 0, 200);
-  draw_cube(0, -1*scale, 0, 200);
-  draw_cube(0, 1*scale, 0, 200);
-  draw_cube(0, 0, -1*scale, 200);
-  draw_cube(0, 0, 1*scale, 200);
+  space_3d.add_model(7, PYRAMID_3, -1*scale, -1*scale, 0, 200);
+  space_3d.add_model(8, PYRAMID_3,  1*scale,  1*scale, 0, 200);
+  space_3d.add_model(9, PYRAMID_3, -1*scale,  1*scale, 0, 200);
+  space_3d.add_model(10, PYRAMID_3, 1*scale, -1*scale, 0, 200);
+
+  space_3d.add_model(11, PYRAMID_3, -1*scale, -1*scale, -1*scale, 200);
+  space_3d.add_model(12, PYRAMID_3,  1*scale,  1*scale, -1*scale, 200);
+  space_3d.add_model(13, PYRAMID_3, -1*scale,  1*scale, -1*scale, 200);
+  space_3d.add_model(14, PYRAMID_3,  1*scale, -1*scale, -1*scale, 200);
+
+  space_3d.add_model(15, PYRAMID_3, -1*scale, -1*scale, 1*scale, 200);
+  space_3d.add_model(16, PYRAMID_3,  1*scale,  1*scale, 1*scale, 200);
+  space_3d.add_model(17, PYRAMID_3, -1*scale,  1*scale, 1*scale, 200);
+  space_3d.add_model(18, PYRAMID_3,  1*scale, -1*scale, 1*scale, 200);
 }
 
-// ----------------------------------------------
-// main loop
-// ----------------------------------------------
+void squares(Space3D &space_3d)
+{
+  space_3d.clear_all();
+  space_3d.add_model(0, SQUARE, 0, 0, 0, 200);
+  space_3d.add_model(1, SQUARE, 400, 0, 0, 200);
+}
+
 void loop() {
-  gfx.display();
-  Serial.println("Adding points to the 3D space...");
-  
+  Serial.println("Initialising camera perspective");
   Perspective perspective;
   perspective.angleX = 0;
   perspective.angleY = 0;
   perspective.angleZ = 0;
 
-  uint16_t scale = 0;
+  Serial.println("Create Space3D object");
+  space_3d.set_perspective(perspective);
 
+  Serial.println("Call display() method");
+  space_3d.display();
+
+  uint16_t scale = 0;
   float degrees_per_tick = 1.5;
 
   while (1)
-  {   
-    Serial.println("Set perspective and projection");
+  {
+    cube_explosion(space_3d, scale);
+    space_3d.load_models();
 
-    cube_explosion(scale+=5);
-
-    if (scale > 1500)
+    scale += 1;
+    if(scale>800)
     {
-      scale = 1500;
+      scale = 800;
     }
 
     perspective.angleX += degrees_per_tick;
     perspective.angleY += degrees_per_tick / 10;
     perspective.angleZ += degrees_per_tick / 10;
 
-    space3D.set_perspective(perspective);
-
-    space3D.project();
-    space3D.render(gfx);
-
-    space3D.clear_2d();
+    space_3d.set_perspective(perspective);
+    space_3d.project();
+    space_3d.render();
   }
-
-  Serial.println("Wait 1000ms before trying it all again");
-  delay(1000);
-  space3D.clear();
 }
