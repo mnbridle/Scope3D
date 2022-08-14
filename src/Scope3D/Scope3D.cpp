@@ -1,8 +1,8 @@
 #include <cmath>
-#include "space_3d.hpp"
+#include "Scope3D.hpp"
 
 // ---------------- OPERATIONS TO ADD PRIMITIVES ----------------
-void Space3D::add_model(uint16_t id, Primitives primitive_type, float offset_x, float offset_y, float offset_z, float scaleFactor)
+void Scope3D::add_model(uint16_t id, Primitives primitive_type, float offset_x, float offset_y, float offset_z, float scaleFactor)
 {
     switch (primitive_type)
     {
@@ -21,8 +21,10 @@ void Space3D::add_model(uint16_t id, Primitives primitive_type, float offset_x, 
 }
 
 // ---------------- GLOBAL PROJECTION AND RENDERING ----------------
-void Space3D::load_models()
+void Scope3D::load_models()
 {
+    uint64_t start_time = esp_timer_get_time();
+
     // Clear 2d, 3d and edges
     clear_render();
 
@@ -50,10 +52,15 @@ void Space3D::load_models()
             edges[idx] += offset;
         }
     }
+
+    uint64_t end_time = esp_timer_get_time();
+    model_load_time = end_time - start_time;
 }
 
-void Space3D::project()
+void Scope3D::project()
 {
+    uint64_t start_time = esp_timer_get_time();
+
     // Rotate all points according to the global_perspective
     Vertex3D vertex_3d;
     clear_2d();
@@ -67,9 +74,13 @@ void Space3D::project()
 
         vertices_2d.push_back(project_point(vertex_3d));
     }
+
+    uint64_t end_time = esp_timer_get_time();
+    projection_time = end_time - start_time;
+
 }
 
-Vertex Space3D::project_point(Vertex3D vertex_3d)
+Vertex Scope3D::project_point(Vertex3D vertex_3d)
 {
     // Do some basic projection
     float x = vertex_3d.x + (vertex_3d.z*0.3) + 2048;
@@ -83,8 +94,10 @@ Vertex Space3D::project_point(Vertex3D vertex_3d)
     return point_2d;
 }
 
-void Space3D::render()
+void Scope3D::render()
 {
+    uint64_t start_time = esp_timer_get_time();
+
     Edge edge;
 
     // Get starting coordinate
@@ -109,16 +122,30 @@ void Space3D::render()
         gfx.moveto(static_cast<uint16_t>(from.x), static_cast<uint16_t>(from.y));
         gfx.lineto(static_cast<uint16_t>(to.x), static_cast<uint16_t>(to.y));
     }
+
+    uint64_t end_time = esp_timer_get_time();
+    render_time = end_time - start_time;
+
+    // Call overlay
+    main_window.draw(gfx);
     display();
+
+    frame_rate = 1000000.0/(mainwindowdraw_time + model_load_time + display_time + projection_time + render_time);
+    Serial.print("Frame rate: ");
+    Serial.print(frame_rate);
+    Serial.println(" fps");
 }
 
-void Space3D::display()
+void Scope3D::display()
 {
+    uint64_t start_time = esp_timer_get_time();
     gfx.display();
+    uint64_t end_time = esp_timer_get_time();
+    display_time = end_time - start_time;
 }
 
 // ---------------- MANIPULATE 3D VERTICES ----------------
-Vertex3D Space3D::rotate_point(Vertex3D vertex_3d, float angle, bool rotate_x, bool rotate_y, bool rotate_z)
+Vertex3D Scope3D::rotate_point(Vertex3D vertex_3d, float angle, bool rotate_x, bool rotate_y, bool rotate_z)
 {
     // Rotate x, then y, then z based on angles in perspective
     float x, y, z;
@@ -147,34 +174,34 @@ Vertex3D Space3D::rotate_point(Vertex3D vertex_3d, float angle, bool rotate_x, b
 
 // ---------------- CLEAR DATA FROM SPACE ----------------
 
-void Space3D::clear_2d()
+void Scope3D::clear_2d()
 {
     vertices_2d.clear();
 }
 
-void Space3D::clear_3d()
+void Scope3D::clear_3d()
 {
     vertices_3d.clear();
 }
 
-void Space3D::clear_edges()
+void Scope3D::clear_edges()
 {
     edges.clear();
 }
 
-void Space3D::clear_models()
+void Scope3D::clear_models()
 {
     models.clear();
 }
 
-void Space3D::clear_render()
+void Scope3D::clear_render()
 {
     clear_2d();
     clear_3d();
     clear_edges();
 }
 
-void Space3D::clear_all()
+void Scope3D::clear_all()
 {
     clear_render();
     clear_models();
@@ -182,13 +209,13 @@ void Space3D::clear_all()
 
 // Operations to add vertices and edges
 
-bool Space3D::add_vertex_3d(Vertex3D vertex_3d)
+bool Scope3D::add_vertex_3d(Vertex3D vertex_3d)
 {
     vertices_3d.push_back(vertex_3d);
     return true;
 }
 
-bool Space3D::add_edge(Edge edge)
+bool Scope3D::add_edge(Edge edge)
 {
     edges.push_back(edge);
     return true;
@@ -196,17 +223,17 @@ bool Space3D::add_edge(Edge edge)
 
 // Get information about the 3d space
 
-uint16_t Space3D::get_vertices_2d_count()
+uint16_t Scope3D::get_vertices_2d_count()
 {
     return vertices_2d.size();
 }
 
-uint16_t Space3D::get_vertices_3d_count()
+uint16_t Scope3D::get_vertices_3d_count()
 {
     return vertices_3d.size();
 }
 
-uint16_t Space3D::get_edge_count()
+uint16_t Scope3D::get_edge_count()
 {
     return edges.size();
 }

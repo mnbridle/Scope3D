@@ -15,16 +15,17 @@
 
 #include "primitives/3d/cube.hpp"
 #include "primitives/3d/pyramid_3.hpp"
-
 #include "primitives/2d/square.hpp"
+
+#include "overlay/MainWindow.hpp"
 
 using namespace std;
 
-class Space3D
+class Scope3D
 {
     public:
-        Space3D() {
-            gfx.begin();
+        Scope3D() {
+            gfx.begin(32);
             Serial.println("Done!");
         };
 
@@ -77,4 +78,14 @@ class Space3D
 
         Vertex3D rotate_point(Vertex3D, float angle, bool rotate_x, bool rotate_y, bool rotate_z);
         Vertex project_point(Vertex3D point);
+
+        MainWindow main_window;
+
+        // Timing and benchmarking information
+        uint64_t render_time = 0;
+        uint64_t projection_time = 0;
+        uint64_t display_time = 0;
+        uint64_t mainwindowdraw_time = 0;
+        uint64_t model_load_time = 0;
+        float frame_rate = 0;
 };
