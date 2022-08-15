@@ -15,6 +15,7 @@
 
 #include "primitives/3d/cube.hpp"
 #include "primitives/3d/pyramid_3.hpp"
+#include "primitives/3d/teapot.hpp"
 #include "primitives/2d/square.hpp"
 
 #include "overlay/MainWindow.hpp"
@@ -37,9 +38,10 @@ class Scope3D
         };
 
         // Get info about wireframe
-        uint16_t get_vertices_3d_count();
-        uint16_t get_edge_count();
-        uint16_t get_vertices_2d_count();
+        size_t get_vertices_3d_count();
+        size_t get_edge_count();
+        size_t get_vertices_2d_count();
+        size_t get_model_count();
 
         // Add shape or volume
         void add_model(uint16_t id, Primitives primitive_type, float offset_x, float offset_y, float offset_z, float scaleFactor);

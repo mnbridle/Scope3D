@@ -15,6 +15,9 @@ void Scope3D::add_model(uint16_t id, Primitives primitive_type, float offset_x, 
         case PYRAMID_3:
             models.push_back(pyramid_3(id, offset_x, offset_y, offset_z, scaleFactor));
             break;
+        case TEAPOT:
+            models.push_back(teapot(id, offset_x, offset_y, offset_z, scaleFactor));
+            break;
         default:
             break;
     }
@@ -127,13 +130,11 @@ void Scope3D::render()
     render_time = end_time - start_time;
 
     // Call overlay
-    main_window.draw(gfx);
+    // main_window.draw(gfx);
+    main_window.show_stats(gfx, frame_rate, get_model_count(), get_vertices_2d_count(), get_edge_count());
     display();
 
     frame_rate = 1000000.0/(mainwindowdraw_time + model_load_time + display_time + projection_time + render_time);
-    Serial.print("Frame rate: ");
-    Serial.print(frame_rate);
-    Serial.println(" fps");
 }
 
 void Scope3D::display()
@@ -223,17 +224,22 @@ bool Scope3D::add_edge(Edge edge)
 
 // Get information about the 3d space
 
-uint16_t Scope3D::get_vertices_2d_count()
+size_t Scope3D::get_vertices_2d_count()
 {
     return vertices_2d.size();
 }
 
-uint16_t Scope3D::get_vertices_3d_count()
+size_t Scope3D::get_vertices_3d_count()
 {
     return vertices_3d.size();
 }
 
-uint16_t Scope3D::get_edge_count()
+size_t Scope3D::get_edge_count()
 {
     return edges.size();
+}
+
+size_t Scope3D::get_model_count()
+{
+    return models.size();
 }

@@ -6,5 +6,6 @@ enum Primitives {
     PYRAMID_4,
     CUBE,
     SPHERE,
+    TEAPOT,
     CUSTOM
 };
