@@ -1,7 +1,7 @@
 #include <Arduino.h>
 
 #define SCOPE3D_H
-#include "Scope3D/Scope3D.hpp"
+#include <Scope3D.hpp>
 
 #include "animations/animations.hpp"
 
