@@ -11,7 +11,7 @@ void teapot(Scope3D &scope_3d, uint16_t scale)
 {
   scope_3d.clear_all();
   scope_3d.add_model(0, TEAPOT, 0, 0, 0, scale);
-  scope_3d.add_model(1, AXES, 0, 0, 0, scale);
+  scope_3d.add_model(1, AXES, 0, 0, 0, scale*5);
 }
 
 void squares(Scope3D &scope_3d)

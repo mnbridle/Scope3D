@@ -52,7 +52,7 @@ void loop() {
   scale_per_tick = 2.5;
   degrees_per_tick = 1.5;
 
-  while (esp_timer_get_time() - start_time < 30*1000000)
+  while (esp_timer_get_time() - start_time < 10*1000000)
   {
     axes(scope_3d, scale);
     scope_3d.load_models();
