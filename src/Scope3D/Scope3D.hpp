@@ -16,6 +16,7 @@
 #include "primitives/3d/cube.hpp"
 #include "primitives/3d/pyramid_3.hpp"
 #include "primitives/3d/teapot.hpp"
+#include "primitives/3d/axes.hpp"
 #include "primitives/2d/square.hpp"
 
 #include "overlay/MainWindow.hpp"

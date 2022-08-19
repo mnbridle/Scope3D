@@ -18,6 +18,9 @@ void Scope3D::add_model(uint16_t id, Primitives primitive_type, float offset_x, 
         case TEAPOT:
             models.push_back(teapot(id, offset_x, offset_y, offset_z, scaleFactor));
             break;
+        case AXES:
+            models.push_back(axes(id, offset_x, offset_y, offset_z, scaleFactor));
+            break;
         default:
             break;
     }

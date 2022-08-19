@@ -7,5 +7,6 @@ enum Primitives {
     CUBE,
     SPHERE,
     TEAPOT,
+    AXES,
     CUSTOM
 };
